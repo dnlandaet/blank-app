@@ -25,7 +25,6 @@ uploaded_file = st.sidebar.file_uploader(
 
 @st.cache_data
 def process_data(file):
-    # Cargar según la extensión
     if file.name.endswith('.csv'):
         df = pd.read_csv(file)
     else:
@@ -68,7 +67,6 @@ if uploaded_file is not None:
 else:
     st.info("👆 Por favor sube tu archivo con las columnas de A a AA usando el botón de la izquierda. Abajo se muestran datos de prueba de ejemplo:")
     
-    # Dataset simulado si no hay archivo subido aún
     demo_data = {
         'Customer Name': ['Cliente 1', 'Cliente 2', 'Cliente 3', 'Cliente 4', 'Cliente 5', 'Cliente 6'],
         'Total Balance in LC': [120000, 250000, 180000, 310000, 140000, 290000],
@@ -85,7 +83,6 @@ else:
 # ---------------------------------------------------------
 st.sidebar.header("🔍 Filtros")
 
-# Filtro por Analista (por defecto selecciona Daniel Landaeta y Maria Bedoya)
 analistas_disponibles = list(df['Analyst'].dropna().unique())
 analistas_meta = [a for a in ['Daniel Landaeta', 'Maria Bedoya'] if a in analistas_disponibles]
 default_analistas = analistas_meta if len(analistas_meta) > 0 else analistas_disponibles
@@ -96,7 +93,6 @@ selected_analysts = st.sidebar.multiselect(
     default=default_analistas
 )
 
-# Filtro por Año
 anios_disponibles = sorted([int(y) for y in df['Año'].dropna().unique()])
 default_years = [y for y in [2024, 2025] if y in anios_disponibles]
 
@@ -106,7 +102,6 @@ selected_years = st.sidebar.multiselect(
     default=default_years if len(default_years) > 0 else anios_disponibles
 )
 
-# Aplicar filtros
 df_filtered = df[(df['Analyst'].isin(selected_analysts)) & (df['Año'].isin(selected_years))]
 
 # ---------------------------------------------------------
@@ -122,7 +117,6 @@ balance_2025 = df_filtered[df_filtered['Año'] == 2025]['Total Balance in LC'].s
 ar_2024 = df_filtered[df_filtered['Año'] == 2024]['Total Past Due'].sum()
 ar_2025 = df_filtered[df_filtered['Año'] == 2025]['Total Past Due'].sum()
 
-# Cálculos de variación
 var_balance = ((balance_2025 - balance_2024) / balance_2024 * 100) if balance_2024 > 0 else 0
 var_ar = ((ar_2025 - ar_2024) / ar_2024 * 100) if ar_2024 > 0 else 0
 
@@ -135,7 +129,7 @@ col4.metric("AR Vencido (2025)", f"${ar_2025:,.2f}", f"{var_ar:+.1f}%", delta_co
 st.markdown("---")
 
 # ---------------------------------------------------------
-# 4. GRÁFICOS Y ANALISIS
+# 4. GRÁFICOS Y ANÁLISIS
 # ---------------------------------------------------------
 col_g1, col_g2 = st.columns(2)
 
@@ -193,19 +187,3 @@ st.dataframe(
     }),
     use_container_width=True
 )
-```eof
-
-```text:requirements.txt
-streamlit
-pandas
-openpyxl
-plotly
-```eof
-
-He generado el archivo principal `streamlit_app.py` junto con el archivo de librerías `requirements.txt`.
-
-### Pasos finales para aplicar este código en GitHub Codespaces:
-1. Reemplaza el código del archivo `streamlit_app.py` en tu entorno de desarrollo en la nube con el código proporcionado.
-2. Asegúrate de actualizar también el archivo `requirements.txt`.
-3. Haz clic en el menú lateral izquierdo de Git (`Control de código fuente`), escribe un mensaje de cambio y presiona **Commit & Sync Changes**.
-4. ¡Abre tu aplicación en Streamlit Cloud y sube tu archivo Excel o CSV para ver la comparación automática en vivo!
